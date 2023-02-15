@@ -28,7 +28,7 @@ export default function MyJokesRoute() {
                 data.jokes.length >= 1 ? (<ul>
                     {data.jokes.map(joke=>(
                     <li key={joke.id}>
-                        <Link to={joke.id}>{joke.name}</Link>
+                        <Link to={`/jokes/${joke.id}`}>{joke.name}</Link>
                     </li>
                     ))}
                 </ul>) : (<h4 style={{"marginBottom":"1rem"}}>You do not have any own jokes yet!</h4>)

@@ -53,13 +53,23 @@
   
   .jokes-main .container {
     display: flex;
-    gap: 1rem;
+    gap: 4rem;
+    margin: 0 auto;
   }
   
   .jokes-list {
     max-width: 12rem;
   }
-  
+  .jokes-list ul {
+    list-style: none;
+    padding: 0;
+  }
+  .jokes-list .linksWrapper{
+    display: flex;
+  }
+  .jokes-list .linksWrapper .firstLink{
+    margin-right: 1rem;
+  }
   .jokes-outlet {
     flex: 1;
   }

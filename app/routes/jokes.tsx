@@ -1,8 +1,7 @@
 import type { LinksFunction, LoaderFunction } from "@remix-run/node";
-import { Outlet, Link, useLoaderData, Form } from "@remix-run/react";
+import { Outlet, Link, useLoaderData, Form, NavLink } from "@remix-run/react";
 import type {Joke, User} from "@prisma/client"
 import stylesUrl from "~/styles/jokes.css";
-import { db } from "~/utils/db.server";
 import { getUser } from "~/utils/session.server";
 
 export const links: LinksFunction = () => {
@@ -12,12 +11,7 @@ type LoaderData = {jokes: Array<Pick<Joke, "id" | "name">>, user: User | null}
 
 export let loader: LoaderFunction = async ({request}) => {
   let user = await getUser(request);
-  let jokes = await db.joke.findMany({
-    take: 5,
-    select: {id: true, name: true},
-    orderBy:{createdAt: "desc"}
-  });
-  let data:LoaderData ={jokes, user};
+  let data:LoaderData ={user};
   return data;
 }
 export default function JokesRoute() {
@@ -53,18 +47,12 @@ export default function JokesRoute() {
         <main className="jokes-main">
           <div className="container">
             <div className="jokes-list">
-              <Link to=".">Get a random joke</Link>
+              <NavLink to=".">Get a random joke</NavLink>
               <p>Here are a few more jokes to check out:</p>
-              <ul>
-                {data.jokes.map(joke=>(
-                  <li key={joke.id}>
-                    <Link to={joke.id}>{joke.name}</Link>
-                  </li>
-                ))}
-              </ul>
-              <Link to="new" className="button">
-                Add your own
-              </Link>
+              <div className="linksWrapper">
+                <Link className="firstLink" to="allJokes">All jokes</Link>
+                <Link to="myJokes">My jokes</Link>
+              </div>
             </div>
             <div className="jokes-outlet">
               <Outlet />

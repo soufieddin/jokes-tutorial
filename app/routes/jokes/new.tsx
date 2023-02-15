@@ -3,6 +3,7 @@ import { redirect } from "@remix-run/node";
 import { Form, useActionData, useTransition } from "@remix-run/react";
 import { db } from "~/utils/db.server";
 import { badRequest } from "~/utils/request.server";
+import {  requireUserId } from "~/utils/session.server";
 
 function validateJokeName(name: string){
   if(name.trim().length < 3) {
@@ -17,6 +18,7 @@ function validateJokeContent(content: string){
 }
 
 export let action: ActionFunction = async ({request}: ActionArgs) => {
+  let userId = await requireUserId(request);
   let formData = await request.formData();
   let name = formData.get('name');
   let content= formData.get('content')
@@ -41,7 +43,7 @@ export let action: ActionFunction = async ({request}: ActionArgs) => {
     });
   }
   let joke = await db.joke.create({
-    data: fields
+    data: { ...fields, jokesterId: userId },
   })
   return redirect(`/jokes/${joke.id}`)
 }

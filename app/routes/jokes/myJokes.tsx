@@ -1,22 +1,20 @@
-import type { Joke, User } from "@prisma/client";
+import type { Joke } from "@prisma/client";
 import type { LoaderFunction } from "@remix-run/node";
 import { Link, NavLink, useLoaderData } from "@remix-run/react";
 import { db } from "~/utils/db.server";
-import { getUser, requireUserId } from "~/utils/session.server";
+import { requireUserId } from "~/utils/session.server";
 
-type LoaderData = {jokes: Array<Pick<Joke, "id" | "name">>, user: User | null}
+type LoaderData = {jokes: Array<Pick<Joke, "id" | "name">>}
 
 export let loader: LoaderFunction = async ({request}) => {
     let userId = await requireUserId(request);
-    let user = await getUser(request);
-
-  let jokes = await db.joke.findMany({
+    let jokes = await db.joke.findMany({
     where: {jokesterId : userId},
     take: 5,
     select: {id: true, name: true},
     orderBy:{createdAt: "desc"}
   });
-  let data:LoaderData ={jokes, user};
+  let data:LoaderData ={jokes};
   return data;
 }
 

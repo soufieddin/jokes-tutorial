@@ -99,7 +99,7 @@ export async function createUserSession(
     try {
       const user = await db.user.findUnique({
         where: { id: userId },
-        select: { id: true, username: true },
+        select: { id: true, username: true, jokes: true },
       });
       return user;
     } catch {

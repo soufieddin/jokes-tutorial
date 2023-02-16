@@ -2,8 +2,8 @@ import type { ActionFunction, LoaderArgs, MetaFunction} from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { db } from "~/utils/db.server";
-import { Form, Link, useLoaderData, useParams } from "@remix-run/react";
-import { getUser, requireUserId } from "~/utils/session.server";
+import { Form, Link, useCatch, useLoaderData, useParams } from "@remix-run/react";
+import { getUser, getUserId, requireUserId } from "~/utils/session.server";
 
 
 export const loader = async ({ params, request }: LoaderArgs) => {
@@ -12,7 +12,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
     where: { id: params.jokeId },
   });
   if (!joke) {
-    throw new Error("Joke not found");
+    throw new Response("Joke not found", { status: 404});
   }
   const jokester = await db.user.findUnique({
     where: {id: joke.jokesterId}
@@ -20,19 +20,25 @@ export const loader = async ({ params, request }: LoaderArgs) => {
   return json({ joke, userInfo, jokester });
 };
 export const action: ActionFunction = async({request, params}) => {
-  let userId= await requireUserId(request);
-  const joke = await db.joke.findUnique({
-    where: { id: params.jokeId },
-  });
-  if(joke?.jokesterId === userId) {
-    await db.joke.delete({
-      where: { 
-        id: params.jokeId,
-      },
-    })
-    return redirect("/jokes/myJokes");
+  let form = await request.formData();
+  let userId= await getUserId(request);
+  if(form.get('_method') === 'delete'){
+    const joke = await db.joke.findUnique({
+      where: { id: params.jokeId },
+    });
+    if(!joke) {
+      throw new Response("What a joke! Not found", { status: 404})
+    }
+    if(joke.jokesterId === userId) {
+      await db.joke.delete({
+        where: { 
+          id: params.jokeId,
+        },
+      })
+      return redirect("/jokes/myJokes");
+    }
+    throw new Response("You are not allowed to delete this joke!", {status: 403});
   }
-  throw new Error("You are not allowed to delete others joke!");
   //return redirect("/jokes/myJokes");
 }
 export const meta: MetaFunction = ({data}) => ({
@@ -40,6 +46,7 @@ export const meta: MetaFunction = ({data}) => ({
 });
 export default function JokeRoute() {
   let data = useLoaderData<typeof loader>();
+  let isOwner = data.joke.jokesterId === data.userInfo?.id
   //let actionData = useActionData<typeof action>();
   console.log(data);
     return (
@@ -51,9 +58,10 @@ export default function JokeRoute() {
         <div style={{"display":"flex", "flexDirection":"column"}}>
           <Link to=".">{data.joke.name} Permalink</Link>
           {
-            data.joke.jokesterId === data.userInfo?.id &&
+            isOwner &&
           
             <Form method="post">
+              <input type="hidden" name="_method" value="delete" />
               <button type="submit" className="button"  style={{"marginTop":"1rem","fontWeight":"bold","width":"35%"}}>
                 Delete
               </button>
@@ -63,7 +71,29 @@ export default function JokeRoute() {
       </div>
     );
   }
+  export function CatchBoundary() {
+    let caught = useCatch();
+    switch(caught.status) {
+      case 404:
+        return(
+          <div className="error-container">
+            <p>Joke not found!</p>
+            <Link to="/jokes">Back to Jokes</Link>
+          </div>
+        );
+        case 403:
+        return(
+          <div className="error-container">
+            <p>You are not allowed to delete this joke</p>
+            <Link to="/jokes/myJokes">Go to My Jokes</Link>
+          </div>
+        );
+        default:
+          throw new Error(`Unexpected caught response with status: ${caught.status}`)
+    }
+  }
 
+  
   export function ErrorBoundary({error}:{error:Error}) {
     const { jokeId } = useParams();
     return (

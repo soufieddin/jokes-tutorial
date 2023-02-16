@@ -1,5 +1,5 @@
 import { json } from "@remix-run/node";
-import { useLoaderData, Link } from "@remix-run/react";
+import { useLoaderData, Link, useCatch } from "@remix-run/react";
 
 import { db } from "~/utils/db.server";
 
@@ -10,6 +10,11 @@ export const loader = async () => {
     take: 1,
     skip: randomRowNumber,
   });
+  if (!randomJoke) {
+    throw new Response("No random joke found", {
+      status: 404,
+    });
+  }
   return json({ randomJoke });
 };
 
@@ -27,6 +32,20 @@ export default function JokesIndexRoute() {
   );
 }
 
+export function CatchBoundary() {
+  let caught = useCatch();
+  switch(caught.status) {
+      case 404:
+      return(
+          <div className="error-container">
+          <p>There are no jokes to display.</p>
+          <Link to="/">Bcke to Safty!</Link>
+          </div>
+      );
+      default:
+          throw new Error(`Unexpected caught response with status: ${caught.status}`)
+  }
+}
 export function ErrorBoundary() {
   return (
     <div className="error-container">

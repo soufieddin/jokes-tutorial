@@ -1,9 +1,9 @@
-import type { ActionFunction, ActionArgs } from "@remix-run/node";
+import type { ActionFunction, ActionArgs, LoaderFunction } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
-import { Form, useActionData, useTransition } from "@remix-run/react";
+import { Form, Link, useActionData, useCatch, useTransition } from "@remix-run/react";
 import { db } from "~/utils/db.server";
 import { badRequest } from "~/utils/request.server";
-import {  requireUserId } from "~/utils/session.server";
+import {  getUserId, requireUserId } from "~/utils/session.server";
 
 function validateJokeName(name: string){
   if(name.trim().length < 3) {
@@ -16,7 +16,15 @@ function validateJokeContent(content: string){
     return "Joke content must be at least 12 characters long"
   }
 }
-
+export let loader: LoaderFunction = async ({request}) => {
+  let userId = await getUserId(request);
+  if(!userId) {
+    throw new Response("Yo, login first please", {
+      status: 401,
+    })
+  }
+  return{}
+}
 export let action: ActionFunction = async ({request}: ActionArgs) => {
   let userId = await requireUserId(request);
   let formData = await request.formData();
@@ -129,6 +137,20 @@ export default function NewJokeRoute() {
     );
   }
 
+export function CatchBoundary() {
+  let caught = useCatch();
+  switch(caught.status) {
+      case 401:
+      return(
+          <div className="error-container">
+          <p>You must login to create a joke</p>
+          <Link to="/login">Login</Link>
+          </div>
+      );
+      default:
+          throw new Error(`Unexpected caught response with status: ${caught.status}`)
+  }
+}
   export function ErrorBoundary() {
     return (
       <div className="error-container">

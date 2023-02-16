@@ -8,6 +8,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useCatch,
 } from "@remix-run/react";
 
 import globalStylesUrl from "./styles/global.css";
@@ -63,13 +64,28 @@ export default function App() {
   );
 }
 
+export function CatchBoundary() {
+  let caught = useCatch();
+  if(caught.status === 401 || caught.status ===404) {
+    return(
+      <Document>
+        <div className="error-container">
+          <p>You must login to proceed</p>
+          <Link to="/login">Login</Link>
+        </div>
+      </Document>
+    )
+  }
+  throw new Error("Something went wrong!")
+}
+
 export function ErrorBoundary({error}:{error:Error}) {
   return (
     <Document>
       <div className="error-container">
-        <h1>Something went wrong!</h1>
+        <h1>Ooops!</h1>
         <p>{error.message}</p>
-        <Link to="/jokes">Back to Jokes</Link>
+        <Link to="/">Back to Safty</Link>
       </div>
     </Document>
   )

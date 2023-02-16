@@ -11,7 +11,7 @@ type LoaderData = {jokes: Array<Pick<Joke, "id" | "name">>}
 
 export let loader: LoaderFunction = async ({request}) => {
   let jokes = await db.joke.findMany({
-    take: 5,
+    take: 8,
     select: {id: true, name: true},
     orderBy:{createdAt: "desc"}
   });

@@ -51,10 +51,9 @@ export default function JokesRoute() {
         <main className="jokes-main">
           <div className="container">
             <div className="jokes-list">
-              <NavLink to=".">Get a random joke</NavLink>
-              <p>Here are a few more jokes to check out:</p>
               <div className="linksWrapper">
-                <Link className="firstLink" to="allJokes">All jokes</Link>
+                <NavLink to=".">Get a random joke</NavLink>
+                <Link className="firstLink" to="allJokes">Latest jokes</Link>
                 <Link to="myJokes">My jokes</Link>
               </div>
             </div>

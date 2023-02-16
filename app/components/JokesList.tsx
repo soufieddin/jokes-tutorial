@@ -4,6 +4,7 @@ import { Link, NavLink } from "@remix-run/react";
 export default function JokesList({jokes, text, btnText}:{jokes: Array<Pick<Joke, "id" | "name">>, text?:string, btnText?:string}) {
     return(
         <div className="jokes-list">
+            <p>Here are a few more jokes to check out:</p>
             {
                 jokes.length >= 1 ? (<ul>
                     {jokes.map(joke=>(

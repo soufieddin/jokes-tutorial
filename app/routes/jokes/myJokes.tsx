@@ -19,7 +19,6 @@ export let loader: LoaderFunction = async ({request}) => {
     }
     let jokes = await db.joke.findMany({
     where: {jokesterId : userId},
-    take: 5,
     select: {id: true, name: true},
     orderBy:{createdAt: "desc"}
   });

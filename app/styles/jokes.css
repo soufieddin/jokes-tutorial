@@ -58,17 +58,23 @@
   }
   
   .jokes-list {
-    max-width: 12rem;
+    max-width: 20rem;
   }
   .jokes-list ul {
     list-style: none;
     padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .jokes-list ul li{
+    margin-right: 1rem;
   }
   .jokes-list .linksWrapper{
     display: flex;
+    flex-direction: column;
   }
-  .jokes-list .linksWrapper .firstLink{
-    margin-right: 1rem;
+  .jokes-list .linksWrapper a{
+    margin-bottom: .5rem;
   }
   .jokes-outlet {
     flex: 1;

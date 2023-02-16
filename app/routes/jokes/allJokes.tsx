@@ -1,8 +1,12 @@
 import type { Joke } from "@prisma/client";
-import type { LoaderFunction } from "@remix-run/node";
-import { Link, NavLink, useLoaderData } from "@remix-run/react";
+import type { LoaderFunction, MetaFunction } from "@remix-run/node";
+import {  useLoaderData } from "@remix-run/react";
+import JokesList from "~/components/JokesList";
 import { db } from "~/utils/db.server";
 
+export const meta: MetaFunction = () => ({
+    title: "Jokes | All Jokes",
+  });
 type LoaderData = {jokes: Array<Pick<Joke, "id" | "name">>}
 
 export let loader: LoaderFunction = async ({request}) => {
@@ -18,17 +22,6 @@ export let loader: LoaderFunction = async ({request}) => {
 export default function AllJokesRoute() {
     let data = useLoaderData<LoaderData>();
     return(
-        <div className="jokes-list">
-            <ul >
-            {data.jokes.map(joke=>(
-            <li key={joke.id}>
-                <Link to={`/jokes/${joke.id}`}>{joke.name}</Link>
-            </li>
-            ))}
-        </ul>
-        <NavLink to="/jokes/new" className="button">
-            Add your own
-        </NavLink>
-        </div>
+        <JokesList jokes={data.jokes} text="There are no jokes yet!" btnText="Add own joke"/>
     )
 }

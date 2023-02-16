@@ -1,9 +1,10 @@
-import type { ActionFunction, LoaderArgs} from "@remix-run/node";
+import type { ActionFunction, LoaderArgs, MetaFunction} from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { db } from "~/utils/db.server";
-import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
+import { Form, Link, useLoaderData } from "@remix-run/react";
 import { getUser, requireUserId } from "~/utils/session.server";
+
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   const userInfo = await getUser(request);
@@ -31,9 +32,12 @@ export const action: ActionFunction = async({request, params}) => {
     })
     return redirect("/jokes/myJokes");
   }
-  //throw new Error("You are not allowed to others joke!");
-  return redirect("/jokes/myJokes");
+  throw new Error("You are not allowed to delete others joke!");
+  //return redirect("/jokes/myJokes");
 }
+export const meta: MetaFunction = ({data}) => ({
+  title: data?.joke?.name ? `Jokes |  ${data?.joke?.name}` : "Some joke",
+});
 export default function JokeRoute() {
   let data = useLoaderData<typeof loader>();
   //let actionData = useActionData<typeof action>();
@@ -49,12 +53,12 @@ export default function JokeRoute() {
           {
             data.joke.jokesterId === data.userInfo?.id &&
           
-          <Form method="post">
-            <button type="submit" className="button"  style={{"marginTop":"1rem","fontWeight":"bold","width":"35%"}}>
-              Delete
-            </button>
-          </Form>
-        } 
+            <Form method="post">
+              <button type="submit" className="button"  style={{"marginTop":"1rem","fontWeight":"bold","width":"35%"}}>
+                Delete
+              </button>
+            </Form>
+          }
         </div>
       </div>
     );

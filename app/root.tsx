@@ -1,6 +1,7 @@
 import type { LinksFunction, MetaFunction } from "@remix-run/node";
 
 import {
+  Link,
   Links,
   LiveReload,
   Meta,
@@ -12,6 +13,7 @@ import {
 import globalStylesUrl from "./styles/global.css";
 import globalMediumStylesUrl from "./styles/global-medium.css";
 import globalLargeStylesUrl from "./styles/global-large.css";
+import type { ReactNode } from "react";
 
 export const links: LinksFunction = () => {
   return [
@@ -33,23 +35,42 @@ export const links: LinksFunction = () => {
 };
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
-  title: "New Remix App",
+  title: "Jokes Remix App",
   viewport: "width=device-width,initial-scale=1",
 });
 
-export default function App() {
+function Document({children}:{children:ReactNode}) {
   return (
     <html lang="en">
-      <head>
-        <Meta />
-        <Links />
-      </head>
-      <body>
-        <Outlet />
-        <ScrollRestoration />
-        <Scripts />
-        <LiveReload />
-      </body>
-    </html>
+    <head>
+      <Meta />
+      <Links />
+    </head>
+    <body>
+      {children}
+      <ScrollRestoration />
+      <Scripts />
+      <LiveReload />
+    </body>
+  </html>
+  )
+}
+export default function App() {
+  return (
+   <Document>
+     <Outlet />
+   </Document>
   );
+}
+
+export function ErrorBoundary({error}:{error:Error}) {
+  return (
+    <Document>
+      <div className="error-container">
+        <h1>Something went wrong!</h1>
+        <p>{error.message}</p>
+        <Link to="/jokes">Back to Jokes</Link>
+      </div>
+    </Document>
+  )
 }

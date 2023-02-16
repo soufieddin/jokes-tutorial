@@ -1,4 +1,4 @@
-import type { LinksFunction, LoaderFunction } from "@remix-run/node";
+import type { LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/node";
 import { Outlet, Link, useLoaderData, Form, NavLink } from "@remix-run/react";
 import type {Joke, User} from "@prisma/client"
 import stylesUrl from "~/styles/jokes.css";
@@ -7,6 +7,10 @@ import { getUser } from "~/utils/session.server";
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: stylesUrl }];
 };
+export const meta: MetaFunction = () => ({
+  title: "Jokes",
+});
+
 type LoaderData = {jokes: Array<Pick<Joke, "id" | "name">>, user: User | null}
 
 export let loader: LoaderFunction = async ({request}) => {

@@ -8,7 +8,7 @@ export default function JokesList({jokes, text, btnText}:{jokes: Array<Pick<Joke
                 jokes.length >= 1 ? (<ul>
                     {jokes.map(joke=>(
                     <li key={joke.id}>
-                        <Link to={`/jokes/${joke.id}`}>{joke.name}</Link>
+                        <Link prefetch="intent" to={`/jokes/${joke.id}`}>{joke.name}</Link>
                     </li>
                     ))}
                 </ul>) : (<h4 style={{"marginBottom":"1rem"}}>{text}</h4>)

@@ -41,9 +41,18 @@ export const action: ActionFunction = async({request, params}) => {
   }
   //return redirect("/jokes/myJokes");
 }
-export const meta: MetaFunction = ({data}) => ({
-  title: data?.joke?.name ? `Jokes |  ${data?.joke?.name}` : "Some joke",
-});
+export const meta: MetaFunction = ({data}) => {
+  if(!data){
+    return {
+      title: "Whoops!",
+      description: "oh no, something went wrong"
+    }
+  }
+  return {
+    title: `Joke about ${data.joke.name} by ${data.jokester?.username}`,
+    description: `this is a funny joke by ${data.jokester?.username} about ${data.joke.name}`
+  }
+};
 export default function JokeRoute() {
   let data = useLoaderData<typeof loader>();
   let isOwner = data.joke.jokesterId === data.userInfo?.id

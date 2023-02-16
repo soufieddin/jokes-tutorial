@@ -27,4 +27,8 @@ export default function MyJokesRoute() {
     return(
         <JokesList jokes={data.jokes} text="You did not add any jokes yet!" btnText="Add another one"/>
     )
-}
+}export function ErrorBoundary({error}:{error:Error}) {
+    return (
+      <div className="error-container">{`Something went wrong! Sorry.`}<br/><em><strong>{error.message}</strong></em></div>
+    );
+  }

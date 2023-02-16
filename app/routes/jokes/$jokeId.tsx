@@ -2,7 +2,7 @@ import type { ActionFunction, LoaderArgs, MetaFunction} from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { db } from "~/utils/db.server";
-import { Form, Link, useLoaderData } from "@remix-run/react";
+import { Form, Link, useLoaderData, useParams } from "@remix-run/react";
 import { getUser, requireUserId } from "~/utils/session.server";
 
 
@@ -61,5 +61,12 @@ export default function JokeRoute() {
           }
         </div>
       </div>
+    );
+  }
+
+  export function ErrorBoundary({error}:{error:Error}) {
+    const { jokeId } = useParams();
+    return (
+      <div className="error-container">{`There was an error with loading or handeling joke by the id ${jokeId}. Sorry.`}<br/><em><strong>{error.message}</strong></em></div>
     );
   }
